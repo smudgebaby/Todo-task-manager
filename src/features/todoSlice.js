@@ -5,7 +5,7 @@ const todoSlice = createSlice({
   initialState: [],
   reducers: {
     addTodo: (state, action) => {
-      const { text, targetDate, priority } = action.payload;
+      const { text, targetDate, priority, category } = action.payload;
       state.push({
         id: Date.now(),
         text,
@@ -13,6 +13,8 @@ const todoSlice = createSlice({
         createdDate: new Date().toISOString(),
         targetDate,
         priority,
+        category,
+        deleted: false,
       });
     },
     toggleTodo: (state, action) => {
@@ -20,15 +22,25 @@ const todoSlice = createSlice({
       if (todo) todo.completed = !todo.completed;
     },
     deleteTodo: (state, action) => {
-      return state.filter((todo) => todo.id !== action.payload);
+      const todo = state.find((todo) => todo.id === action.payload);
+      if (todo) {
+        todo.deleted = true;
+      }
+    },
+    restoreTodo: (state, action) => {
+      const todo = state.find((todo) => todo.id === action.payload);
+      if (todo) {
+        todo.deleted = false;
+      }
     },
     editTodo: (state, action) => {
-      const { id, newText, newTargetDate, newPriority } = action.payload;
+      const { id, newText, newTargetDate, newPriority, newCategory } = action.payload;
       const todo = state.find((todo) => todo.id === id);
       if (todo) {
         todo.text = newText;
         todo.targetDate = newTargetDate;
         todo.priority = newPriority;
+        todo.category = newCategory;
       }
     },
     sortTodos: (state, action) => {
@@ -50,5 +62,5 @@ const todoSlice = createSlice({
   },
 });
 
-export const { addTodo, toggleTodo, deleteTodo, editTodo, sortTodos } = todoSlice.actions;
+export const { addTodo, toggleTodo, deleteTodo, editTodo, sortTodos, restoreTodo } = todoSlice.actions;
 export default todoSlice.reducer;

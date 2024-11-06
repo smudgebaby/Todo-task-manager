@@ -1,17 +1,26 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { toggleTodo, deleteTodo, editTodo } from '../features/todoSlice';
+import { toggleTodo, deleteTodo, editTodo, restoreTodo } from '../features/todoSlice';
 import { ListItem, ListItemText, Checkbox, IconButton, TextField, Button, Box, Typography, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
+import RestoreIcon from '@mui/icons-material/Restore';
 
-function TodoItem({ todo }) {
+const categoryStyles = {
+  Appointments: { borderLeft: '4px solid #BFECFF', paddingLeft: '16px' },
+  Groceries: { borderLeft: '4px solid #FFCCEA', paddingLeft: '16px' },
+  Starred: { borderLeft: '4px solid #9e56ff', paddingLeft: '16px' },
+};
+
+function TodoItem({ todo, isDeletedSection }) {
   const dispatch = useDispatch();
-
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.text);
   const [editTargetDate, setEditTargetDate] = useState(todo.targetDate);
   const [editPriority, setEditPriority] = useState(todo.priority);
+  const [editCategory, setEditCategory] = useState(todo.category);
   const [error, setError] = useState('');
 
   const handleSave = () => {
@@ -19,7 +28,7 @@ function TodoItem({ todo }) {
       setError('Todo cannot be empty');
       return;
     }
-    dispatch(editTodo({ id: todo.id, newText: editText, newTargetDate: editTargetDate, newPriority: editPriority }));
+    dispatch(editTodo({ id: todo.id, newText: editText, newTargetDate: editTargetDate, newPriority: editPriority, newCategory: editCategory }));
     setIsEditing(false);
     setError('');
   };
@@ -28,6 +37,7 @@ function TodoItem({ todo }) {
     setEditText(todo.text);
     setEditTargetDate(todo.targetDate);
     setEditPriority(todo.priority);
+    setEditCategory(todo.category);
     setIsEditing(false);
     setError('');
   };
@@ -35,6 +45,11 @@ function TodoItem({ todo }) {
   return (
     <ListItem
       secondaryAction={
+        isDeletedSection ? (
+          <IconButton edge="end" aria-label="restore" onClick={() => dispatch(restoreTodo(todo.id))}>
+            <RestoreIcon />
+          </IconButton>
+        ) : (
         !isEditing && (
           <Box>
             <IconButton edge="end" aria-label="edit" onClick={() => setIsEditing(true)}>
@@ -45,13 +60,21 @@ function TodoItem({ todo }) {
             </IconButton>
           </Box>
         )
+      )
       }
+      sx={{
+        ...(categoryStyles[todo.category] || {}),
+        backgroundColor: todo.completed ? 'rgba(158, 86, 255, 0.1)' : 'white',
+      }}
     >
       <Checkbox
         edge="start"
         checked={todo.completed}
         onChange={() => dispatch(toggleTodo(todo.id))}
         color="primary"
+        icon={<RadioButtonUncheckedIcon />}
+        checkedIcon={<RadioButtonCheckedIcon />}
+        disabled={todo.deleted}
       />
       {isEditing ? (
         <Box display="flex" flexDirection="column" width="100%">
@@ -90,6 +113,18 @@ function TodoItem({ todo }) {
               </Select>
             </FormControl>
           </Box>
+          <FormControl size="small" sx={{ width: '100%', mt: 1 }}>
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={editCategory}
+              onChange={(e) => setEditCategory(e.target.value)}
+              label="Category"
+            >
+              <MenuItem value="Starred">Starred</MenuItem>
+              <MenuItem value="Appointments">Appointments</MenuItem>
+              <MenuItem value="Groceries">Groceries</MenuItem>
+            </Select>
+          </FormControl>
           <Box mt={1} display="flex" justifyContent="flex-end">
             <Button variant="contained" color="primary" onClick={handleSave} sx={{ mr: 1 }}>
               Save
@@ -108,13 +143,7 @@ function TodoItem({ todo }) {
                 Priority: {todo.priority.charAt(0).toUpperCase() + todo.priority.slice(1)}
               </Typography>
               <Typography variant="body2" color="textSecondary">
-                Created on: {new Intl.DateTimeFormat('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: 'numeric',
-                  minute: 'numeric',
-                }).format(new Date(todo.createdDate))}
+                Category: {todo.category}
               </Typography>
               <Typography variant="body2" color="textSecondary">
                 Target Date: {new Intl.DateTimeFormat('en-US', {

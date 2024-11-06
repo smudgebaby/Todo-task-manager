@@ -7,14 +7,16 @@ function TodoInput({ onClose }) {
   const [text, setText] = useState('');
   const [targetDate, setTargetDate] = useState('');
   const [priority, setPriority] = useState('none');
+  const [category, setCategory] = useState('');
   const dispatch = useDispatch();
 
   const handleAddTodo = () => {
     if (text.trim() && targetDate) {
-      dispatch(addTodo({ text, targetDate, priority }));
+      dispatch(addTodo({ text, targetDate, priority, category }));
       setText('');
       setTargetDate('');
       setPriority('none');
+      setCategory('');
       if (onClose) onClose();
     }
   };
@@ -52,6 +54,18 @@ function TodoInput({ onClose }) {
           </Select>
         </FormControl>
       </Box>
+      <FormControl sx={{ width: '100%', mb: 2 }}>
+        <InputLabel>Category</InputLabel>
+        <Select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          label="Category"
+        >
+          <MenuItem value="Appointments">Appointments</MenuItem>
+          <MenuItem value="Groceries">Groceries</MenuItem>
+          <MenuItem value="Starred">Starred</MenuItem>
+        </Select>
+      </FormControl>
       <Button variant="contained" color="primary" onClick={handleAddTodo}>
         Add Todo
       </Button>

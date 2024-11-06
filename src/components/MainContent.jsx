@@ -6,23 +6,27 @@ import { sortTodos } from '../features/todoSlice';
 
 function MainContent({ section }) {
   const dispatch = useDispatch();
-  const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
   const [anchorEl, setAnchorEl] = useState(null);
   const [sortBy, setSortBy] = useState('');
   const [sortOrder, setSortOrder] = useState('ascending');
   const [searchQuery, setSearchQuery] = useState('');
 
   const tasks = useSelector((state) => {
-    if (section === 'All Tasks') {
-      return state.todos;
-    } else if (section === 'Today') {
-      return state.todos.filter((todo) => todo.targetDate === today);
-    } else if (section === 'Completed') {
-      return state.todos.filter((todo) => todo.completed);
-    } else if (section === 'Search') {
-      return state.todos.filter((todo) => todo.text.toLowerCase().includes(searchQuery.toLowerCase()));
-    } else {
-      return state.todos.filter((todo) => todo.section === section);
+    if (section === 'Archived Tasks') {
+      return state.todos.filter((todo) => todo.deleted);
+    }
+    switch (section) {
+      case 'All Tasks':
+        return state.todos.filter((todo) => !todo.deleted);
+      case 'Today':
+        return state.todos.filter((todo) => todo.targetDate === today && !todo.deleted);
+      case 'Completed':
+        return state.todos.filter((todo) => todo.completed && !todo.deleted);
+      case 'Search':
+        return state.todos.filter((todo) => todo.text.toLowerCase().includes(searchQuery.toLowerCase()) && !todo.deleted);
+      default:
+        return state.todos.filter((todo) => todo.category === section && !todo.deleted);
     }
   });
 
@@ -81,18 +85,18 @@ function MainContent({ section }) {
         </Box>
       }
       {section !== 'Search' && 
-      <List>
-        {tasks.map((task) => (
-          <TodoItem key={task.id} todo={task} />
-        ))}
-      </List>
+        <List>
+          {tasks.map((task) => (
+            <TodoItem key={task.id} todo={task} isDeletedSection={section === 'Archived Tasks'} />
+          ))}
+        </List>
       }
-      {section === 'Search' &&  searchQuery&&
-      <List>
-        {tasks.map((task) => (
-          <TodoItem key={task.id} todo={task} />
-        ))}
-      </List>
+      {section === 'Search' &&  searchQuery &&
+        <List>
+          {tasks.map((task) => (
+            <TodoItem key={task.id} todo={task} />
+          ))}
+        </List>
       }
     </Box>
   );
