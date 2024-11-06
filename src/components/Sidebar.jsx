@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Drawer, List, ListItem, ListItemText, ListItemIcon, Divider, Typography } from '@mui/material';
+import { Box, Drawer, List, ListItemText, ListItemIcon, Divider, Typography } from '@mui/material';
 import Collapse from '@mui/material/Collapse';
 import ListItemButton from '@mui/material/ListItemButton';
 import TodayIcon from '@mui/icons-material/Today';
@@ -43,7 +43,7 @@ function Sidebar({ handleSectionChange, handleAddTask }) {
     >
       <Box sx={{ overflow: 'auto', padding: 2 }}>
         <List>
-          <ListItem
+          <ListItemButton
             button
             onClick={handleAddTask}
             sx={{
@@ -57,9 +57,9 @@ function Sidebar({ handleSectionChange, handleAddTask }) {
               <AddCircleIcon color="primary" />
             </ListItemIcon>
             <ListItemText primary={<Typography style={{ color: '#9e56ff' }}>Add task</Typography>} />
-          </ListItem>
+          </ListItemButton>
 
-          <ListItem
+          <ListItemButton
             button
             onClick={() => handleClick('Search')}
             sx={{
@@ -83,9 +83,9 @@ function Sidebar({ handleSectionChange, handleAddTask }) {
               <ListItemText primary="Search" />
             </>
             }
-          </ListItem>
+          </ListItemButton>
 
-          <ListItem
+          <ListItemButton
             button
             onClick={() => handleClick('Today')}
             sx={{
@@ -109,9 +109,9 @@ function Sidebar({ handleSectionChange, handleAddTask }) {
               <ListItemText primary="Today" />
             </>
             }
-          </ListItem>
+          </ListItemButton>
 
-          <ListItem
+          <ListItemButton
             button
             onClick={() => handleClick('Completed')}
             sx={{
@@ -135,15 +135,15 @@ function Sidebar({ handleSectionChange, handleAddTask }) {
               <ListItemText primary="Completed" />
             </>
             }
-          </ListItem>
+          </ListItemButton>
         </List>
         <Divider />
         <Typography variant="subtitle1" sx={{ padding: 2 }}>
-          My Projects
+          My Tasks
         </Typography>
 
         <List>
-          <ListItem
+          <ListItemButton
             button
             onClick={() => handleClick('All Tasks')}
             sx={{
@@ -170,7 +170,7 @@ function Sidebar({ handleSectionChange, handleAddTask }) {
               {open ? <ExpandLess onClick={handleOpen} /> : <ExpandMore onClick={handleOpen} />}
             </>
             }
-          </ListItem>
+          </ListItemButton>
 
           <Collapse in={open} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
@@ -255,7 +255,7 @@ function Sidebar({ handleSectionChange, handleAddTask }) {
 
         <Divider />
         <List>
-          <ListItem
+          <ListItemButton
             button
             onClick={() => handleClick('Archived Tasks')}
             sx={{
@@ -279,7 +279,7 @@ function Sidebar({ handleSectionChange, handleAddTask }) {
               <ListItemText primary="Archived Tasks" />
             </>
             }
-          </ListItem>
+          </ListItemButton>
         </List>
       </Box>
     </Drawer>
